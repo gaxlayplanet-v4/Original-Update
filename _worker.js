@@ -4,7 +4,6 @@ import { connect } from "cloudflare:sockets";
 // CONSTANTS & DEFAULT CONFIGURATION
 // ============================================
 const DEFAULT_LOCAL_PROXIES = [
-  "cdn-b100.xn--b6gac.eu.org",
   "cdn.xn--b6gac.eu.org",
   "bpb.yousef.isegaro.com",
   "icook.hk",
@@ -17,6 +16,51 @@ const CONNECTION_TIMEOUT_MS = 30000; // 30 seconds timeout
 const DEFAULT_RATE_LIMIT_PER_MINUTE = 60;
 const DEFAULT_WS_PATH = "galaxy-tunnel";
 const MAX_CONFIG_PATH_LENGTH = 128;
+
+// ============================================
+// AD & TRACKER DOMAIN BLOCKING
+// Domain-based filtering only; encrypted/server-side ads cannot be identified here.
+// ============================================
+const AD_DOMAIN_SUFFIXES = [
+  "doubleclick.net",
+  "googleadservices.com",
+  "googlesyndication.com",
+  "adservice.google.com",
+  "pagead2.googlesyndication.com",
+  "adcolony.com",
+  "appsflyer.com",
+  "unityads.unity3d.com",
+  "vungle.com",
+  "applovin.com",
+  "flurry.com",
+  "adjust.com",
+  "branch.io",
+  "admob.com",
+  "mopub.com",
+  "criteo.com",
+  "taboola.com",
+  "outbrain.com",
+  "scorecardresearch.com",
+  "quantserve.com",
+  "popads.net",
+  "inmobi.com",
+  "adroll.com",
+  "amazon-adsystem.com",
+  "adsafeprotected.com",
+  "moatads.com",
+  "openx.net",
+  "rubiconproject.com",
+  "pubmatic.com"
+];
+
+function isAdDomain(domain) {
+  if (!domain || typeof domain !== "string") return false;
+  const lower = domain.toLowerCase().trim().replace(/\.$/, "");
+  if (AD_DOMAIN_SUFFIXES.some((suffix) => lower === suffix || lower.endsWith("." + suffix))) {
+    return true;
+  }
+  return /^(ad|ads|adservice|adserver|telemetry|track|tracker|analytics)\./i.test(lower);
+}
 
 // ============================================
 // STRUCTURED LOGGER WITH REQUEST ID (Item 9)
@@ -1483,6 +1527,15 @@ async function handleTCPOutBound(
   rawProxyListUrl,
   logger
 ) {
+  if (isAdDomain(addressRemote)) {
+    logger.info("AD_DOMAIN_BLOCKED", {
+      address: addressRemote,
+      port: portRemote
+    });
+    safeCloseWebSocket(webSocket);
+    return;
+  }
+
   let timeoutTimer = null;
 
   const resetTimeout = () => {
