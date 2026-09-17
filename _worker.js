@@ -593,6 +593,565 @@ function getCamouflage404() {
 }
 
 // ============================================
+// CAMOUFLAGE MASK WEBSITE (EDGE DIAGNOSTICS)
+// ============================================
+function getMaskPage(host = "localhost", isAuthEnabled = true, clientIp = "127.0.0.1", colo = "EDGE-LOCAL") {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EdgeTunnel Cloud | Edge Network & Diagnostics</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 17px;
+      color: #000000;
+      cursor: pointer;
+      user-select: none;
+      line-height: 1.15;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #000000;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 16px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #000000;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+    .btn-portal {
+      background: transparent;
+      border: none;
+      color: #000000;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 0.2s;
+    }
+    .btn-portal:hover {
+      opacity: 0.7;
+    }
+    main {
+      flex: 1;
+      max-width: 960px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .hero-card {
+      background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 40%);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+      position: relative;
+    }
+    .hero-top-badge {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 9999px;
+    }
+    .hero-title {
+      font-size: 23px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+      padding-right: 70px;
+      line-height: 1.25;
+    }
+    .hero-desc {
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 680px;
+      margin-bottom: 18px;
+    }
+    .btn-run {
+      background: #000000;
+      color: #ffffff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    .btn-run:hover { opacity: 0.85; }
+    .btn-run:disabled { opacity: 0.6; cursor: not-allowed; }
+    .bench-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .bench-box {
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .bench-box-1 {
+      background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+      border: 1px solid #a7f3d0;
+    }
+    .bench-box-2 {
+      background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+      border: 1px solid #bbf7d0;
+    }
+    .bench-box-3 {
+      background: linear-gradient(135deg, #e0e7ff 0%, #f5f3ff 100%);
+      border: 1px solid #c7d2fe;
+    }
+    .bench-box-4 {
+      background: linear-gradient(135deg, #fce7f3 0%, #fdf4ff 100%);
+      border: 1px solid #fbcfe8;
+    }
+    .bench-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .bench-box-1 .bench-label { color: #047857; }
+    .bench-box-2 .bench-label { color: #15803d; }
+    .bench-box-3 .bench-label { color: #4338ca; }
+    .bench-box-4 .bench-label { color: #9d174d; }
+    .bench-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 4px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+    }
+    .bench-meta {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .bench-box-1 .bench-meta { color: #059669; }
+    .bench-box-2 .bench-meta { color: #16a34a; }
+    .bench-box-3 .bench-meta { color: #4f46e5; }
+    .bench-box-4 .bench-meta { color: #db2777; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media (min-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+    .card-heading {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 13px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-k { color: #475569; font-weight: 500; }
+    .info-v { color: #0f172a; font-family: monospace; font-weight: 700; }
+    .footer-bar {
+      background: linear-gradient(90deg, #dcfce7 0%, #bbf7d0 50%, #dcfce7 100%);
+      border: 1px solid #a7f3d0;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #065f46;
+      margin-top: 4px;
+    }
+    
+    /* Access Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      padding: 24px;
+      margin: 16px;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-close {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .modal-input {
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 11px 14px;
+      border-radius: 8px;
+      color: #0f172a;
+      font-family: monospace;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 14px;
+    }
+    .modal-input:focus {
+      border-color: #000000;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    }
+    .btn-submit {
+      width: 100%;
+      background: #000000;
+      color: #ffffff;
+      border: none;
+      padding: 11px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-submit:hover { opacity: 0.85; }
+    .auth-msg {
+      font-size: 12px;
+      margin-top: 10px;
+      text-align: center;
+      color: #dc2626;
+      font-weight: 600;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-area" onclick="handleLogoClick()">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <div>EdgeTunnel</div>
+        <div>Cloud</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="status-pill">
+        <span>EDGE OPERATIONAL</span>
+      </div>
+      <button class="btn-portal" onclick="openPortalModal()">
+        <span>🔒 Portal Access</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero-card">
+      <div class="hero-top-badge">Active</div>
+      <h1 class="hero-title">Edge Network Diagnostic &amp; Latency Monitor</h1>
+      <p class="hero-desc">Real-time edge server telemetry, DNS-over-HTTPS status verification, and full-duplex socket connectivity diagnostics for cloud edge clusters.</p>
+      
+      <button class="btn-run" id="btnBench" onclick="runDiagnostics()">
+        ⚡ Re-Run Benchmark
+      </button>
+
+      <div class="bench-grid">
+        <div class="bench-box bench-box-1">
+          <div class="bench-label">Edge Roundtrip Ping</div>
+          <div class="bench-val" id="pingVal">-- ms</div>
+          <div class="bench-meta" id="pingStatus">Measuring...</div>
+        </div>
+        <div class="bench-box bench-box-2">
+          <div class="bench-label">DNS-Over-HTTPS (DoH)</div>
+          <div class="bench-val">Active</div>
+          <div class="bench-meta">Cloudflare 1.1.1.1</div>
+        </div>
+        <div class="bench-box bench-box-3">
+          <div class="bench-label">WebSocket Engine</div>
+          <div class="bench-val">Full-Duplex</div>
+          <div class="bench-meta">RFC 6455 Ready</div>
+        </div>
+        <div class="bench-box bench-box-4">
+          <div class="bench-label">Edge Cluster Location</div>
+          <div class="bench-val">${colo}</div>
+          <div class="bench-meta">Anycast Network</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-heading">🌐 Connection Telemetry</div>
+        <div class="info-row">
+          <span class="info-k">Client Remote IP:</span>
+          <span class="info-v">${clientIp}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-k">Serving Host:</span>
+          <span class="info-v">${host}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-k">HTTP Protocol:</span>
+          <span class="info-v">HTTP/2 &amp; HTTP/3 (QUIC)</span>
+        </div>
+        <div class="info-row">
+          <span class="info-k">Encryption &amp; Cipher:</span>
+          <span class="info-v">TLS 1.3 / AEAD ChaCha20</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-heading">🛡️ Edge Security &amp; Health</div>
+        <div class="info-row">
+          <span class="info-k">DDoS Mitigation:</span>
+          <span class="info-v" style="color: #16a34a;">Active (Strict)</span>
+        </div>
+        <div class="info-row">
+          <span class="info-k">Global Edge Cache:</span>
+          <span class="info-v">100% Operational</span>
+        </div>
+        <div class="info-row">
+          <span class="info-k">WAF Security Layer:</span>
+          <span class="info-v">Enforced</span>
+        </div>
+        <div class="info-row">
+          <span class="info-k">Service Status:</span>
+          <span class="info-v" style="color: #16a34a;">Optimal (99.99%)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      EdgeTunnel Cloud Network • High Availability Edge Gateway • All Systems Running
+    </div>
+  </main>
+
+  <!-- Admin Auth Modal -->
+  <div class="modal-overlay" id="portalModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">
+          <span>🔒 Edge Gateway Access</span>
+        </div>
+        <button class="btn-close" onclick="closePortalModal()">✕</button>
+      </div>
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 14px; line-height: 1.5;">
+        Please enter your Universal Unique Identifier (UUID) or Dashboard Access Password to unlock the administrative console.
+      </p>
+      <form onsubmit="handlePortalLogin(event)">
+        <input type="password" id="authKeyInput" class="modal-input" placeholder="Enter UUID or Password" required autofocus />
+        <button type="submit" class="btn-submit" id="submitBtn">Unlock Console</button>
+      </form>
+      <div class="auth-msg" id="authErrorMsg">⚠️ Invalid UUID or Password. Access Denied.</div>
+    </div>
+  </div>
+
+  <script>
+    let logoClicks = 0;
+    function handleLogoClick() {
+      logoClicks++;
+      if (logoClicks >= 3) {
+        openPortalModal();
+        logoClicks = 0;
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        openPortalModal();
+      }
+      if (e.key === 'Escape') {
+        closePortalModal();
+      }
+    });
+
+    function openPortalModal() {
+      document.getElementById('portalModal').classList.add('open');
+      document.getElementById('authKeyInput').focus();
+    }
+
+    function closePortalModal() {
+      document.getElementById('portalModal').classList.remove('open');
+      document.getElementById('authErrorMsg').style.display = 'none';
+    }
+
+    async function handlePortalLogin(e) {
+      e.preventDefault();
+      const key = document.getElementById('authKeyInput').value.trim();
+      const errorMsg = document.getElementById('authErrorMsg');
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (!key) return;
+      submitBtn.textContent = "Verifying...";
+      submitBtn.disabled = true;
+      errorMsg.style.display = 'none';
+
+      try {
+        const resp = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key })
+        });
+        const data = await resp.json();
+
+        if (resp.ok && data.success) {
+          window.location.href = data.redirect || ('/' + encodeURIComponent(key));
+        } else {
+          errorMsg.textContent = data.message || "⚠️ Invalid Access Key / UUID.";
+          errorMsg.style.display = 'block';
+          submitBtn.textContent = "Unlock Console";
+          submitBtn.disabled = false;
+        }
+      } catch (err) {
+        // Fallback: direct navigation with key
+        window.location.href = '/' + encodeURIComponent(key);
+      }
+    }
+
+    async function runDiagnostics() {
+      const btn = document.getElementById('btnBench');
+      const pingVal = document.getElementById('pingVal');
+      const pingStatus = document.getElementById('pingStatus');
+
+      btn.disabled = true;
+      btn.textContent = "Testing Edge Latency...";
+      pingVal.textContent = "...";
+      pingStatus.textContent = "Measuring round-trip...";
+
+      const pings = [];
+      for (let i = 0; i < 3; i++) {
+        const start = performance.now();
+        try {
+          await fetch('/api/health?t=' + Date.now(), { cache: 'no-store' });
+          const latency = Math.round(performance.now() - start);
+          pings.push(latency);
+        } catch (e) {
+          pings.push(32);
+        }
+        await new Promise(r => setTimeout(r, 120));
+      }
+
+      const avg = Math.round(pings.reduce((a, b) => a + b, 0) / pings.length);
+      pingVal.textContent = avg + ' ms';
+      pingStatus.textContent = "Good Latency";
+      btn.disabled = false;
+      btn.textContent = "⚡ Re-Run Benchmark";
+    }
+
+    // Auto run once
+    setTimeout(runDiagnostics, 500);
+  </script>
+</body>
+</html>`;
+}
+
+
+// ============================================
 // VLESS CONFIGURATION & SUBSCRIPTION OUTPUT
 // ============================================
 function normalizeWsPath(value) {
@@ -673,6 +1232,7 @@ const worker_default = {
     const rawProxyListUrl = env.PROXY_LIST_URL || "";
     const dohURL = env.DNS_RESOLVER_URL || DEFAULT_DOH_URL;
     const configuredWsPath = normalizeWsPath(env.WS_PATH || DEFAULT_WS_PATH);
+    const envPassword = String(env.PASSWORD || env.password || "").trim();
 
     // Health check endpoint (Item 10)
     if (url.pathname === "/health" || url.pathname === "/api/health") {
@@ -697,6 +1257,44 @@ const worker_default = {
     // CORS preflight options
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: getSecurityHeaders("text/plain") });
+    }
+
+    // Portal login: configured UUID or optional PASSWORD unlocks the dashboard.
+    if (url.pathname === "/api/login" && request.method === "POST") {
+      try {
+        const body = await request.json().catch(() => ({}));
+        const submittedKey = String(body.key || body.password || body.uuid || "").trim();
+        const validUuidKey = isValidUUID(userID) && submittedKey.toLowerCase() === userID.toLowerCase();
+        const validPasswordKey = Boolean(envPassword) && submittedKey === envPassword;
+        if (validUuidKey || validPasswordKey) {
+          return new Response(JSON.stringify({ success: true, redirect: isValidUUID(userID) ? `/${userID}` : "/" }), {
+            status: 200,
+            headers: {
+              ...getSecurityHeaders("application/json"),
+              "Set-Cookie": "galaxy_auth=1; Path=/; Max-Age=86400; SameSite=Lax; HttpOnly"
+            }
+          });
+        }
+        return new Response(JSON.stringify({ success: false, message: "Invalid UUID or Password" }), {
+          status: 401,
+          headers: getSecurityHeaders("application/json")
+        });
+      } catch {
+        return new Response(JSON.stringify({ success: false, message: "Login error" }), {
+          status: 400,
+          headers: getSecurityHeaders("application/json")
+        });
+      }
+    }
+
+    if (url.pathname === "/api/logout") {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          "Location": "/",
+          "Set-Cookie": "galaxy_auth=0; Path=/; Max-Age=0; SameSite=Lax"
+        }
+      });
     }
 
     // Base64 VLESS subscription (TLS/443, HTTP/80, optional safe ProxyIP)
@@ -746,16 +1344,20 @@ const worker_default = {
       return await proxyOverWSHandler(request, userID, proxyIP, rawProxyListUrl, dohURL, logger);
     }
 
-    // Validate UUID on regular web visits (Item 1: return 401 Unauthorized + steps page)
-    if (!isValidUUID(userID)) {
-      logger.info("VISIT_WITHOUT_UUID_SERVED_401");
-      return new Response(getUnauthorizedPage(), {
-        status: 401,
+    // Public visitors see the requested EdgeTunnel diagnostic mask page.
+    // The configured UUID path or a short-lived auth cookie opens the Galaxy console.
+    const cookieHeader = request.headers.get("Cookie") || "";
+    const hasAuthCookie = cookieHeader.split(";").some((item) => item.trim() === "galaxy_auth=1");
+    const directUuidPath = isValidUUID(pathname) && isValidUUID(userID) && pathname.toLowerCase() === userID.toLowerCase();
+
+    if (directUuidPath || hasAuthCookie) {
+      logger.info("GALAXY_PAGE_SERVED");
+      return new Response(getGalaxyPage(), {
+        status: 200,
         headers: getSecurityHeaders("text/html; charset=utf-8")
       });
     }
 
-    // Check path for normal GET visits (Item 11: non-matching subpaths return 404 camouflage)
     if (pathname !== "" && pathname !== configuredWsPath) {
       return new Response(getCamouflage404(), {
         status: 404,
@@ -763,9 +1365,11 @@ const worker_default = {
       });
     }
 
-    // Normal Web Browser Request -> Render Galaxy Page (Item 12: with noindex)
-    logger.info("GALAXY_PAGE_SERVED");
-    return new Response(getGalaxyPage(), {
+    const maskHost = request.headers.get("Host") || url.host;
+    const maskClientIp = request.headers.get("CF-Connecting-IP") || "127.0.0.1";
+    const maskColo = request.cf?.colo || "EDGE-GLOBAL";
+    logger.info("MASK_PAGE_SERVED");
+    return new Response(getMaskPage(maskHost, Boolean(envPassword || isValidUUID(userID)), maskClientIp, maskColo), {
       status: 200,
       headers: getSecurityHeaders("text/html; charset=utf-8")
     });
